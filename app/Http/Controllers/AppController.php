@@ -3,14 +3,17 @@
 namespace App\Http\Controllers;
 use SmyPhp\Core\Controller\Controller;
 use SmyPhp\Core\Http\Request;
-use App\Http\Middleware\Authenticate;
+use SmyPhp\Core\Http\Response;
 use SmyPhp\Core\Application;
 use App\Http\Requests\CreateRequest;
+use App\Http\Middleware\Authenticate;
+use App\Http\Requests\EditRequest;
+use App\Models\Post;
 
 class AppController extends Controller{
 
     public function __construct(){
-        $this->authenticatedMiddleware(new Authenticate(['create']));
+        $this->authenticatedMiddleware(new Authenticate(['create', 'myPosts', 'edit']));
     }
 
     public function homePage(){
@@ -82,7 +85,52 @@ class AppController extends Controller{
         ]);
     }
 
-    public function view(){
-        return $this->render('view');
+    public function myPosts(){
+        return $this->render('mypost');
     }
+
+    public function view(Request $request, Response $response){
+        $id = $request->getParams();
+        $post = new Post;
+        $value = $post->findAllWhere([
+            'id' => implode("",$id)
+        ]);
+        if(!empty($value)){
+            return $this->render('view', $value);
+        }else{
+            Application::$app->session->setFlash('error', 'Post Not Found');
+            Application::$app->response->redirect('/');
+        }
+    }
+
+    public function edit(Request $request, Response $response){
+        $id = $request->getParams();
+        $post = new Post;
+        $value = $post->findAllWhere([
+            'id' => implode("",$id)
+        ]);
+        if(!empty($value)){
+            return $this->render('edit', $value);
+        }else{
+            Application::$app->session->setFlash('error', 'Post Not Found');
+            Application::$app->response->redirect('/my-posts');
+        }
+    }
+
+    public function delete(Request $request, Response $response){
+        $id = $request->getParams();
+        $post = new Post;
+        $value = $post->delete([
+            'id' => implode("",$id)
+        ]);
+        if(!empty($value)){
+            Application::$app->session->setFlash('success', 'Post Deleted');
+            Application::$app->response->redirect('/my-posts');
+        }else{
+            Application::$app->session->setFlash('error', 'Post Not Found');
+            Application::$app->response->redirect('/my-posts');
+        }
+    }
+
+    
 }

@@ -16,8 +16,12 @@ use App\Http\Controllers\AuthController;
 
 $app->router->get('/', [AppController::class, 'homePage']);
 $app->router->get('/create', [AppController::class, 'create']);
+$app->router->get('/my-posts', [AppController::class, 'myPosts']);
 $app->router->get('/view/{id}', [AppController::class, 'view']);
+$app->router->get('/edit/{id}', [AppController::class, 'edit']);
+$app->router->get('/delete/{id}', [AppController::class, 'delete']);
 $app->router->post('/create', [AppController::class, 'create']);
+$app->router->post('/editPost', [AppController::class, 'editPost']);
 $app->router->get('/login', [AuthController::class, 'login']);
 $app->router->post('/login', [AuthController::class, 'login']);
 $app->router->get('/register', [AuthController::class, 'register']);

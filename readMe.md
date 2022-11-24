@@ -37,10 +37,8 @@ Smyphp is a lightweight PHP framework built for developers who need a simple fra
 
 # INSTALLATION
 
-Clone the repository
-
 ```shell
-$ 
+$ composer create-project seguncodes/smyphp yourProjectName
 ```
 # USAGE
 
@@ -333,6 +331,9 @@ The form builder also comes with various input types
         <input type="submit" class="btn btn-block btn-primary" value="Submit">
     </div>
 <?php \SmyPhp\Core\Form\Form::stop()?>
+
+//for text area field
+echo new TextareaField($model, 'textarea')
 ```
 
 ### Custom Form Labels
@@ -515,12 +516,20 @@ use App\Http\Middleware\Authenticate;
 class ExampleController extends Controller{
 
     public function __construct(){
-        $this->authenticatedMiddleware(new Authenticate([]));
+        $this->authenticatedMiddleware(new Authenticate(['']));
     }
 }
 ```
-The `Authenticate` middleware is called in the controller, the routes that should not be accesible by the user is passed in array of `new Authenticate([])`.
+The `Authenticate` middleware is called in the controller, the method handling the route that should not be accesible by the user is passed in array of `new Authenticate([''])`.
 
+To prevent a user from accessing a page after login, add the following code to the top of the file rendering that page; or to set restrictions for users who are logged in or not
+```php
+use SmyPhp\Core\Application;
+if (!Application::$app->isGuest()) {
+    Application::$app->response->redirect('/');
+}
+```
+The `isGuest()` function is used to check if there is an existing session
 
 
 ### SENDING MAIL

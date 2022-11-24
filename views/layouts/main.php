@@ -38,6 +38,7 @@
                         <?php echo Application::$app->user->getDisplayName() ?>
                     </a>
                     <ul class="dropdown-menu">
+                    <li><a class="dropdown-item" href="/my-posts">My Posts</a></li>
                         <li><a class="dropdown-item" href="/logout">logout</a></li>
                     </ul>
                 </li>
@@ -46,10 +47,15 @@
             </div>
         </div>
     </nav>
-    <div class="container">
+    <div class="container mt-2">
         <?php if(Application::$app->session->getFlash('success')): ?>
             <div class="alert alert-success">
                 <?php echo Application::$app->session->getFlash('success') ?>
+            </div>
+        <?php endif; ?>
+        <?php if(Application::$app->session->getFlash('error')): ?>
+            <div class="alert alert-danger">
+                <?php echo Application::$app->session->getFlash('error') ?>
             </div>
         <?php endif; ?>
     </div>
