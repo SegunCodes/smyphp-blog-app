@@ -7,7 +7,7 @@ use SmyPhp\Core\Application;
     <div class="row">
         <h1>Create</h1>
         <div class="col-12">
-            <form action="<?php Application::$ROOT_DIR."/create"?>" method="POST" enctype="multipart/form-data">
+            <form action="/create" method="POST" enctype="multipart/form-data">
                 <div class="mb-3">
                     <label for="exampleFormControlInput1" class="form-label">Title</label>
                     <input type="text" name="title" class="form-control" required id="exampleFormControlInput1">

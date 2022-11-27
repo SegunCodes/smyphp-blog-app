@@ -106,11 +106,21 @@ class AppController extends Controller{
     public function edit(Request $request, Response $response){
         $id = $request->getParams();
         $post = new Post;
-        $value = $post->findAllWhere([
+        $val = $post->findAllWhere([
             'id' => implode("",$id)
         ]);
-        if(!empty($value)){
-            return $this->render('edit', $value);
+        //check if id exists
+        if(!empty($val)){
+            //check if user made the id
+            $value = $post->findAllWhere([
+                'id' => implode("",$id),
+                'poster_id' => Application::$app->user->id
+            ]);
+            if(!empty($value)){
+                return $this->render('edit', $value);
+            }
+            Application::$app->session->setFlash('error', 'You do not have access to this post');
+            Application::$app->response->redirect('/my-posts');
         }else{
             Application::$app->session->setFlash('error', 'Post Not Found');
             Application::$app->response->redirect('/my-posts');
@@ -132,5 +142,74 @@ class AppController extends Controller{
         }
     }
 
+    public function editPost(Request $request, Response $response){
+        if($request->isPost()){
+            $title = $_POST["title"];
+            $body = $_POST["body"];
+            $id = $_POST["id"];
+            if(isset($_FILES['file']) && $_FILES['file']["error"] == 0){
+                $allowed = array(
+                    "jpg" => "image/jpg", 
+                    "jpeg" => "image/jpeg", 
+                    "gif" => "image/gif", 
+                    "png" => "image/png"
+                );
+                $filename = time().'_'.$_FILES['file']["name"];
+                $filetype = $_FILES['file']["type"];
+                $filesize = $_FILES['file']["size"];
+                $directory = "images";
+                $path = Application::$ROOT_DIR."/routes/assets/$directory";
+                if (!file_exists($path)) {
+                    mkdir($path, 0777, true);
+                }
+                // Verify file extension
+                $ext = pathinfo($filename, PATHINFO_EXTENSION);
+                if(!array_key_exists($ext, $allowed))
+                Application::$app->session->setFlash('error', 'Select a valid file format');
+                Application::$app->response->redirect('/my-posts');
+                
+            
+                // Verify file size
+                $maxsize = 4 * 1024 * 1024;
+                if($filesize > $maxsize)
+                Application::$app->session->setFlash('error', 'Image size is larger than the allowed limit - 4MB');
+                Application::$app->response->redirect('/my-posts');
     
+                // Verify MYME type of the file
+                if(in_array($filetype, $allowed)){
+                    //check if directory name is given
+                    if($directory = null){
+                        Application::$app->session->setFlash('error', 'Directory name not given');
+                        Application::$app->response->redirect('/my-posts');
+                    }
+                    // Check whether file exists before uploading it
+                    if(file_exists($path."/".$filename)){
+                        Application::$app->session->setFlash('error', 'File already exists');
+                        Application::$app->response->redirect('/my-posts');
+                    } else{
+                        move_uploaded_file($_FILES['file']["tmp_name"], $path."/".$filename);
+                        $edit = new EditRequest();
+                        $edit->setPostId($id);
+                        $edit->setTitle($title);
+                        $edit->setBody($body);
+                        $edit->setFile($filename);
+                        $edit->update();
+                        Application::$app->session->setFlash('success', 'post updated');
+                        Application::$app->response->redirect('/my-posts');
+                    } 
+                } else{
+                    Application::$app->session->setFlash('error', 'There was a problem uploading the file. Please try again.');
+                    Application::$app->response->redirect('/my-posts');
+                }
+            } else{
+                $edit = new EditRequest();
+                $edit->setPostId($id);
+                $edit->setTitle($title);
+                $edit->setBody($body);
+                $edit->updateNoFile();
+                Application::$app->session->setFlash('success', 'post updated');
+                Application::$app->response->redirect('/my-posts');
+            }
+        }
+    }
 }

@@ -5,9 +5,9 @@ use SmyPhp\Core\Application;
 ?>
 <div class="container">
     <div class="row">
-        <h1>Create</h1>
+        <h1>Edit</h1>
         <div class="col-12">
-            <form action="<?php Application::$ROOT_DIR."/editPost"?>" method="POST" enctype="multipart/form-data">
+            <form action="/editPost" method="POST" enctype="multipart/form-data">
                 <input type="text" name="id" hidden value="<?php echo $value['id']?>">
                 <div class="mb-3">
                     <label for="exampleFormControlInput1" class="form-label">Title</label>
